@@ -1,0 +1,186 @@
+import maya.cmds as cmds
+import math as m
+
+def createBroc(level, scaleFactor):
+    
+    newbudList=[]
+
+    incr = 360.0/50
+    
+
+        
+    if level == 1:
+        
+        for i in range(1,50):    
+            name = cmds.polyCone(r=0.78, h=1.9, cuv=3)
+            newbudList.append(name[0])  
+            size = 1.05 + 0.07*i
+            b = 0.15*i
+            a = 5
+            tx = b*m.exp(.2)*m.sin(a*b)
+            ty = 10 - (0.2*i)
+            tz = b*m.exp(.2)*m.cos(a*b)
+            cmds.move(tx, ty, tz, r=True)
+            cmds.scale(size, size, size, r=True)              
+            cmds.rotate(m.sin(incr)*tx*ty, 0, m.cos(incr)*tz*ty, r=True)
+        
+        cmds.polyCone(r=1, h=2, cuv=3)
+        cmds.rename('base')
+        cmds.scale(11.858, 8.248, 11.858, r=True)
+        cmds.move(0, 2.256, 0, r=True)
+        cmds.polySmooth(dv = 1, c = 1, kb=True, ksb=True, khe=False, peh=False, ch=True)
+        cmds.select(newbudList) 
+        grpBroc = cmds.polyUnite(newbudList,'base', n='Broccoli')                
+        cmds.delete('Broccoli', ch=True)     
+        cmds.polySmooth(dv = 1, c = 1, kb = True, ksb=True, khe=False, kt=True, peh = False, ch=True)
+    
+                     
+    else:
+        
+        for i in range(1,10):
+            name = createBroc(level-1, scaleFactor) 
+            newbudList.append(name[0])  
+            size = 0.4 + 0.07*i
+            b = 0.15*i
+            a = 50
+            tx = b*m.exp(.2)*m.sin(a*b)
+            ty = -10-(0.2*i)
+            tz = b*m.exp(.2)*m.cos(a*b)
+            theta = 10 - (0.5*i)
+            cmds.move(tx, ty, tz, r=True)
+            cmds.scale(size, size, size, r=True)              
+            cmds.rotate(m.sin(incr)*tx*theta, 0, m.cos(incr)*tz*theta, r=True) 
+
+       
+        cmds.select(newbudList) 
+        grpBroc = cmds.polyUnite(newbudList,n='Broccoli')                    
+        cmds.delete(ch=True)
+        cmds.polySmooth(dv = 1, c = 1, kb = True, ksb=True, khe=False, kt=True, peh = False, ch=True)                    
+        cmds.move(4.629, 12.594, -0.413, r=True)
+        cmds.rotate(0, 0, -12.825, r=True)
+        cmds.scale(0.961, 1.047, 0.883, r=True)
+        cmds.delete('base1', 'base2', 'base3', 'base4', 'base5', 'base6', 'base7')
+        cmds.polyCone(r=1, h=2, cuv=3, n='bud')
+        cmds.move(2.037, 3.329, 0.038, r=True)
+        cmds.scale(8.583, 8.424, 8.583, r=True)
+        cmds.rotate(203.313, -0.621, -211.947, r=True)
+        cmds.polySmooth(dv = 1, c = 1, kb = True, ksb=True, khe=False, kt=True, peh = False, ch=True)
+        cmds.polySmooth(dv = 1, c = 1, kb = True, ksb=True, khe=False, kt=True, peh = False, ch=True)
+        cmds.polyUnite('bud', 'Broccoli9', n='Romanesco Broccoli')
+        cmds.delete('Romanesco_Broccoli', ch=True)   
+        cmds.scale(scaleFactor,scaleFactor,scaleFactor, r=True)    
+ 
+    return grpBroc   
+
+def createPine(scaleSize):
+    newpineList=[]    
+    incr = 360.0/50	
+    for i in range(1, 150):
+        pine = cmds.polySphere(r=2, cuv=3)
+        newpineList.append(pine[0])
+        size = 1.0 + 0.08*i
+        b = 0.15*i
+        a = 5
+        tx = b*m.exp(.2)*m.sin(a*b)
+        ty = 0.6*i
+        tz = b*m.exp(.2)*m.cos(a*b)
+        cmds.move(tx, ty, tz, r=True)
+        cmds.scale(size, size, size, r=True)              
+        cmds.rotate(m.sin(incr)*tx*ty, 0, m.cos(incr)*tz*ty, r=True)         
+    
+    cmds.select(newpineList)
+    cmds.polyUnite(newpineList, n='PineCone')
+    cmds.delete(ch=True)
+    cmds.scale(scaleSize,scaleSize,scaleSize, r=True)
+    
+def createFlower(scaleFlower):
+    petal = cmds.sphere(r=True)
+    cmds.move(0,0,0, r=True)
+    cmds.scale(0.5,0.3,1.7, r=True)
+    cmds.select(petal)
+    cmds.makeIdentity(apply=True, t=1, r=1, s=1, n=0)
+    newpetalList=[] 
+    newpetalList.append(petal[0]) 
+    cmds.select(newpetalList[0] + '.cv[3][1]')
+    cmds.move(0,2,0, r=True)
+    cmds.sphere(n='core')
+    cmds.scale(0.25,0.05,0.25, r=True)
+    cmds.move(0,0.2,0, r=True)
+    cmds.parent(newpetalList, 'core')
+    numPetals=15
+    for a in range(3,4):
+        for b in range(5,8):
+            cmds.select(newpetalList[0] + '.cv[' + str(a) + '][' + str(b) + ']')
+            cmds.move(0,-0.4,0, r=True)
+
+    cmds.select(newpetalList[0])
+    theta = 360/numPetals  
+    for i in range (1, 15):
+        cmds.duplicate()
+        cmds.rotate(0, theta, 0, r=True) 
+        
+    cmds.select('core')
+    cmds.rename('Flower1')
+    cmds.duplicate(st=True)
+    cmds.scale(0.189,0.038,0.189)
+    cmds.rotate(0, 37.9, 0)
+    cmds.duplicate()
+    cmds.scale(0.09,0.017,0.09)
+    cmds.rotate(0,16.75,0)
+    cmds.duplicate()
+    cmds.scale(0.045,0.008,0.045)
+    cmds.rotate(0,8,0)
+    cmds.delete('Flower1Shape')
+    cmds.delete('Flower2Shape')
+    cmds.delete('Flower3Shape')
+    cmds.delete('Flower4Shape')
+
+    cmds.group('Flower1','Flower2','Flower3','Flower4', n='Lotus', r=True)
+    cmds.scale(scaleFlower,scaleFlower,scaleFlower, r=True)
+    
+def actionBroc(level, scaleFactor, *pArgs):
+	print "Start action"
+	cmds.deleteUI("Window")
+	cmds.select(all=True)
+	cmds.delete()	
+	Broccoli = createBroc(level, scaleFactor)
+
+def actionPine(scaleSize, *pArgs):
+	print "Start action"
+	cmds.deleteUI("Window")
+	cmds.select(all=True)
+	cmds.delete()	
+	PineCone= createPine(scaleSize)
+
+def actionFlower(scaleFlower, *pArgs):
+	print "Start action"
+	cmds.deleteUI("Window")
+	cmds.select(all=True)
+	cmds.delete()	
+	Flower= createFlower(scaleFlower)	
+
+	
+def cancelProc(*pArgs):
+	print "action is cancelled"
+	cmds.deleteUI("Window")
+
+def createUI():	
+	cmds.window("Window")
+	cmds.columnLayout( adjustableColumn=True )
+	level = cmds.intSliderGrp(label='Levels for Broccoli', minValue=1, maxValue=2, value=1, field=True)
+	resizeBrocControl = cmds.floatSliderGrp( label='Scale Broccoli', minValue=0.5, maxValue=2, value=0.8, step=0.01, field = True )
+	resizePineControl = cmds.floatSliderGrp( label='Scale Pine Cone', minValue=0.01, maxValue=0.5, value=0.1, step=0.001, field = True )
+	resizeFlowerControl = cmds.floatSliderGrp( label='Scale Flower', minValue=0.5, maxValue=7, value=3, step=0.001, field = True )
+	
+	cmds.button(label = "Romanesco Broccoli", command = lambda *args: actionBroc( cmds.intSliderGrp(level, query=True, value= True), cmds.floatSliderGrp(resizeBrocControl, query=True, value=True)))
+	cmds.button(label = "Pinecone", command = lambda *args: actionPine( cmds.floatSliderGrp(resizePineControl, query=True, value=True)))
+	cmds.button(label = "Lotus Flower", command = lambda *args: actionFlower( cmds.floatSliderGrp(resizeFlowerControl, query=True, value=True)))
+	cmds.button(label = "Cancel", command = cancelProc)
+	cmds.showWindow()
+
+
+createUI()
+
+
+        
+        
